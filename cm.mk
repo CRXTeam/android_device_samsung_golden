@@ -28,5 +28,5 @@ $(call inherit-product, vendor/cm/config/common_full_phone.mk)
 $(call inherit-product, device/samsung/golden/golden.mk)
 
 # Device specific
-PRODUCT_NAME := cm_golden
+PRODUCT_NAME := pa_golden
 PRODUCT_PACKAGES += Torch
