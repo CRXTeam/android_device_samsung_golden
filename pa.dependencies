@@ -1,0 +1,20 @@
+[
+  {
+    "remote": "cm",
+    "revision": "master",
+    "repository": "NovaFusion/android_kernel_samsung_golden",
+    "target_path": "kernel/samsung/golden"
+  },
+  {
+    "remote": "cm",
+    "revision": "android-4.4.3",
+    "repository": "golden-guy/android_vendor_samsung_golden",
+    "target_path": "vendor/samsung/golden"
+  },
+  {
+    "remote": "cm",
+    "revision": "master",
+    "repository": "NovaFusion/novatp_arm-eabi-4.9",
+    "target_path": "prebuilts/gcc/linux-x86/arm/novatp"
+  } 
+ ]
