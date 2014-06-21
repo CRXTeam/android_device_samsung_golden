@@ -177,15 +177,14 @@ index 461ab44..0bde570 100644
        p = fstab[mount_point]
 -      self.script.append('mount("%s", "%s", "%s", "%s");' %
 +      if p.fs_type == "f2fs":
-+          self.script.append('run_program("mount", "-t", "auto", "%s", "%s");' %
++          self.script.append('run_program("/sbin/mount", "-t", "auto", "%s", "%s");' %
 +                             (p.device, p.mount_point))
 +      else:
 +          self.script.append('mount("%s", "%s", "%s", "%s");' %
                           (p.fs_type, common.PARTITION_TYPES[p.fs_type],
                            p.device, p.mount_point))
--      self.mounts.add(p.mount_point)
-+          self.mounts.add(p.mount_point)
- 
+       self.mounts.add(p.mount_point)
+
    def Unmount(self, mount_point):
      """Unmount the partiiton with the given mount_point."""
 @@ -196,7 +200,11 @@ def FormatPartition(self, partition):
@@ -206,19 +205,94 @@ index 461ab44..0bde570 100644
      common.ZipWriteStr(output_zip, "META-INF/com/google/android/update-binary",
                         data, perms=0755)
 +
+
+From db2ff0dbc6bc18ecd5e9f54fd70c8618efe76818 Mon Sep 17 00:00:00 2001
+From: maclaw <maclaw@maclaw.pl>
+Date: Thu, 19 Jun 2014 10:44:52 -0700
+Subject: [PATCH] installer with progress info
+
+---
+ tools/releasetools/ota_from_target_files | 27 +++++++++++++++++++++++----
+ 1 file changed, 23 insertions(+), 4 deletions(-)
+ mode change 100755 => 100644 tools/releasetools/ota_from_target_files
+
 diff --git a/tools/releasetools/ota_from_target_files b/tools/releasetools/ota_from_target_files
-index 766909a..6b0b22e 100755
+index 766909a..37e2305
 --- a/tools/releasetools/ota_from_target_files
 +++ b/tools/releasetools/ota_from_target_files
-@@ -521,6 +521,12 @@ else if get_stage("%(bcb_dev)s", "stage") == "3/3" then
-   if OPTIONS.wipe_user_data:
-     script.FormatPartition("/data")
+@@ -511,7 +507,14 @@ else if get_stage("%(bcb_dev)s", "stage") == "3/3" then
  
-+  script.Print("");
+   device_specific.FullOTA_InstallBegin()
+ 
++  script.Print(" ");
 +  script.Print("Brought to you by:");
 +  script.Print("NovaFusion");
 +  script.Print("www.NovaFusion.pl");
-+  script.Print("");
++  script.Print(" ");
 +
+   if OPTIONS.backuptool:
++    script.Print("Creating backup....");
+     script.Mount("/system")
+     script.RunBackup("backup")
+     script.Unmount("/system")
+@@ -519,18 +522,24 @@ else if get_stage("%(bcb_dev)s", "stage") == "3/3" then
+   script.ShowProgress(0.5, 0)
+ 
+   if OPTIONS.wipe_user_data:
++    script.Print("Wiping user data....");
+     script.FormatPartition("/data")
+ 
    if "selinux_fc" in OPTIONS.info_dict:
      WritePolicyConfig(OPTIONS.info_dict["selinux_fc"], output_zip)
+ 
++  script.Print("Formatting /system....");
+   script.FormatPartition("/system")
++  script.Print("Mounting /system....");
+   script.Mount("/system")
+   if not OPTIONS.no_separate_recovery:
++    script.Print("Unpacking recovery....");
+     script.UnpackPackageDir("recovery", "/system")
++  script.Print("Installing ROM on /system....");
+   script.UnpackPackageDir("system", "/system")
+ 
+   symlinks = CopySystemFiles(input_zip, output_zip)
++  script.Print("Creating needed symlinks....");
+   script.MakeSymlinks(symlinks)
+ 
+   boot_img = common.GetBootableImage("boot.img", "boot.img",
+@@ -540,6 +549,7 @@ else if get_stage("%(bcb_dev)s", "stage") == "3/3" then
+                                            OPTIONS.input_tmp, "RECOVERY")
+     MakeRecoveryPatch(OPTIONS.input_tmp, output_zip, recovery_img, boot_img)
+ 
++  script.Print("Setting permisions....");
+   Item.GetMetadata(input_zip)
+   Item.Get("system").SetPermissions(script)
+ 
+@@ -549,9 +559,11 @@ else if get_stage("%(bcb_dev)s", "stage") == "3/3" then
+ 
+   if OPTIONS.backuptool:
+     script.ShowProgress(0.2, 10)
++    script.Print("Restoring backup....");
+     script.RunBackup("restore")
+ 
+   script.ShowProgress(0.2, 10)
++  script.Print("Flashing kernel....");
+   script.WriteRawImage("/boot", "boot.img")
+ 
+   script.ShowProgress(0.1, 0)
+@@ -562,6 +574,13 @@ else if get_stage("%(bcb_dev)s", "stage") == "3/3" then
+ 
+   script.UnmountAll()
+ 
++  script.Print("Done!");
++  script.Print(" ");
++  script.Print("Brought to you by:");
++  script.Print("NovaFusion");
++  script.Print("www.NovaFusion.pl");
++  script.Print(" ");
++
+   if OPTIONS.two_step:
+     script.AppendExtra("""
+ set_stage("%(bcb_dev)s", "");
+
+
