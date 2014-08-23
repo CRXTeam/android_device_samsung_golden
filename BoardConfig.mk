@@ -46,12 +46,18 @@ COMMON_GLOBAL_CFLAGS += -DSTE_HARDWARE -DSTE_SAMSUNG_HARDWARE -DUSE_F2FS
 BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x02000000
-TARGET_PREBUILT_KERNEL := device/samsung/golden/rootfs/kernel
+BOARD_KERNEL_CMDLINE := "androidboot.selinux=permissive"
+#TARGET_PREBUILT_KERNEL := device/samsung/golden/rootfs/kernel
 TARGET_NO_INITLOGO := true
 ARM_EABI_TOOLCHAIN := $(ANDROID_BUILD_TOP)/prebuilts/gcc/linux-x86/arm/novatp/bin
-#TARGET_KERNEL_SOURCE := kernel/samsung/golden
-#TARGET_KERNEL_CONFIG := cm_golden_defconfig
-#TARGET_USE_ST_ERICSSON_KERNEL := true
+TARGET_KERNEL_SOURCE := kernel/samsung/golden
+TARGET_KERNEL_CONFIG := cm_golden_defconfig
+TARGET_USE_ST_ERICSSON_KERNEL := true
+
+# Selinux support
+HAVE_SELINUX := true
+BOARD_SEPOLICY_DIRS += device/samsung/golden/selinux
+BOARD_SEPOLICY_UNION += file_contexts
 
 # Graphics
 USE_OPENGL_RENDERER := true
@@ -93,3 +99,6 @@ BOARD_RIL_CLASS := ../../../device/samsung/golden/ril/
 TARGET_SPECIFIC_HEADER_PATH := device/samsung/golden/include
 TARGET_RECOVERY_FSTAB := device/samsung/golden/rootfs/fstab.samsunggolden
 RECOVERY_FSTAB_VERSION := 2
+
+# AROMA support
+USE_SET_METADATA := false
