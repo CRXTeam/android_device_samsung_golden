@@ -2,7 +2,7 @@
   {
     "remote": "cm",
     "revision": "master",
-    "repository": "NovaFusion/android_kernel_samsung_golden",
+    "repository": "CRXTeam/android_kernel_samsung_golden",
     "target_path": "kernel/samsung/golden"
   },
   {
